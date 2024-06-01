@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+</head>
+<body>
+    <h1>Dashboard</h1>
+    <table id="dashboardTable" class="display" style="width:100%">
+        <thead>
+            <tr id="tableHeader"></tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+
+    <script>
+        function loadData() {
+            $.getJSON('https://drive.google.com/uc?export=download&id=1-BldP2RQxfVXDa9hje7T3civXGVNpkzx
+', function(data) {
+                // Clear the table before populating
+                $('#tableHeader').empty();
+                $('#tableBody').empty();
+
+                // Populate table header
+                var columns = data.columns;
+                var headerRow = $('#tableHeader');
+                for (var i = 0; i < columns.length; i++) {
+                    headerRow.append('<th>' + columns[i] + '</th>');
+                }
+
+                // Populate table body
+                var rows = data.data;
+                var tableBody = $('#tableBody');
+                for (var i = 0; i < rows.length; i++) {
+                    var row = $('<tr>');
+                    for (var j = 0; j < rows[i].length; j++) {
+                        row.append('<td>' + rows[i][j] + '</td>');
+                    }
+                    tableBody.append(row);
+                }
+
+                // Initialize DataTables
+                $('#dashboardTable').DataTable();
+            });
+        }
+
+        $(document).ready(function() {
+            loadData();
+            setInterval(loadData, 60000);  // Refresh data every 60 seconds
+        });
+    </script>
+</body>
+</html>
