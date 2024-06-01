@@ -5,46 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
 </head>
 <body>
     <h1>Dashboard</h1>
     <table id="dashboardTable" class="display" style="width:100%">
         <thead>
-            <tr id="tableHeader"></tr>
+            <tr id="tableHeader">
+                <th>Strategy</th>
+                <th>Symbol</th>
+                <th>LTP</th>
+                <th>Quantity</th>
+                <th>Live Status</th>
+                <th>Kite Token</th>
+                <th>Stop Loss</th>
+                <th>Target</th>
+                <th>Type</th>
+                <th>Order Time</th>
+                <th>Current LTP</th>
+            </tr>
         </thead>
         <tbody id="tableBody"></tbody>
     </table>
 
     <script>
         function loadData() {
-            $.getJSON('https://drive.google.com/uc?export=download&id=1-BldP2RQxfVXDa9hje7T3civXGVNpkzx
-', function(data) {
-                // Clear the table before populating
-                $('#tableHeader').empty();
-                $('#tableBody').empty();
+            $.ajax({
+                url: 'https://drive.google.com/uc?export=download&id=1-BldP2RQxfVXDa9hje7T3civXGVNpkzx',
+                dataType: 'json',
+                success: function(data) {
+                    $('#tableBody').empty();  // Clear previous data
 
-                // Populate table header
-                var columns = data.columns;
-                var headerRow = $('#tableHeader');
-                for (var i = 0; i < columns.length; i++) {
-                    headerRow.append('<th>' + columns[i] + '</th>');
-                }
-
-                // Populate table body
-                var rows = data.data;
-                var tableBody = $('#tableBody');
-                for (var i = 0; i < rows.length; i++) {
-                    var row = $('<tr>');
-                    for (var j = 0; j < rows[i].length; j++) {
-                        row.append('<td>' + rows[i][j] + '</td>');
+                    const openTrades = data.open_trades;
+                    for (const strategy in openTrades) {
+                        if (openTrades.hasOwnProperty(strategy)) {
+                            const trades = openTrades[strategy];
+                            for (const symbol in trades) {
+                                if (trades.hasOwnProperty(symbol)) {
+                                    const trade = trades[symbol];
+                                    const row = `
+                                        <tr>
+                                            <td>${strategy}</td>
+                                            <td>${symbol}</td>
+                                            <td>${trade.ltp}</td>
+                                            <td>${trade.qty}</td>
+                                            <td>${trade.live_stat}</td>
+                                            <td>${trade.kite_token}</td>
+                                            <td>${trade.sl}</td>
+                                            <td>${trade.tgt}</td>
+                                            <td>${trade.type}</td>
+                                            <td>${trade.order_time}</td>
+                                            <td>${trade.c_ltp}</td>
+                                        </tr>
+                                    `;
+                                    $('#tableBody').append(row);
+                                }
+                            }
+                        }
                     }
-                    tableBody.append(row);
-                }
 
-                // Initialize DataTables
-                $('#dashboardTable').DataTable();
+                    // Initialize DataTables (reinitialize to handle new data)
+                    if ($.fn.DataTable.isDataTable('#dashboardTable')) {
+                        $('#dashboardTable').DataTable().destroy();
+                    }
+                    $('#dashboardTable').DataTable();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching JSON:', error);
+                }
             });
         }
 
