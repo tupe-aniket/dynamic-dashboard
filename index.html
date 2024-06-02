@@ -32,7 +32,7 @@
     <script>
         function loadData() {
             $.ajax({
-                url: 'https://drive.google.com/uc?export=download&id=1-BldP2RQxfVXDa9hje7T3civXGVNpkzx',
+                url: 'https://cors-anywhere.herokuapp.com/https://drive.google.com/uc?export=download&id=1-BldP2RQxfVXDa9hje7T3civXGVNpkzx',
                 dataType: 'json',
                 success: function(data) {
                     $('#tableBody').empty();  // Clear previous data
